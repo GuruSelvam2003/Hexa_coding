@@ -119,7 +119,7 @@ select * from products where stockQuantity>5
 --5. Retrieve Orders with Total Amount Between $500 and $1000.
 select * from orders where total_price between 500 and 1000
 
---6. Find Products which name end with letter ‘r’.
+--6. Find Products which name end with letter â€˜râ€™.
 select * from products where name like ('%r')
 
 --7. Retrieve Cart Items for Customer 5.
@@ -143,9 +143,12 @@ join orders o on c.customer_id=o.customer_id
 group by c.first_name,c.last_name,o.total_price
 
 --12. Count the Number of Orders Placed by Each Customer.
-select c.first_name,c.last_name, count(o.order_id) as count from customer c
+select c.first_name,c.last_name, count(o.customer_id) as count from customer c
 join orders o on c.customer_id=o.customer_id
-group by c.first_name,c.last_name,o.order_id
+group by c.first_name,c.last_name,o.customer_id
+
+insert into orders (customer_id,order_date,total_price,shipping_address) values
+(1,'2023-01-06',600,'23 gb st')
 
 --13. Find the Maximum Order Amount for Each Customer.	
 select c.first_name,c.last_name, max(o.total_price) as Maximum_amt from customer c
@@ -166,20 +169,28 @@ select first_name,last_name from customer
 where customer_id not in (select customer_id from orders)
 
 --17. Subquery to Calculate the Percentage of Total Revenue for a Product.
-select product_id, name, (select sum(item_amount) from order_items where products.product_id=order_items.product_id)/(select sum(item_amount) from order_items)*100 as Total
+select* from order_items
+select* from products
+
+select product_id, name, (select sum(item_amount) from order_items where products.product_id=order_items.product_id)*
+(select count(item_amount) from order_items where products.product_id=order_items.product_id)/100 as Total
 from products
+
+
 
 --18. Subquery to Find Products with Low Stock.
 select name, stockQuantity from products
-where product_id in (select product_id from products where stockQuantity<10)
+where stockQuantity in (select min(stockQuantity) from products )
 
 --19. Subquery to Find Customers Who Placed High-Value Orders.
 select first_name, last_name from customer
-where customer_id in (select customer_id from orders where total_price>800)
+where customer_id in (select top 1 customer_id from orders order by total_price desc)
 
 select* from customer
 select* from products
 select* from orders
 select* from order_items
 select* from cart
+
+
 
